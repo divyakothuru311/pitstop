@@ -1,0 +1,13 @@
+---
+pool: default
+trigger:
+  - main
+stages:
+  - stage: 'build'
+    displayName: "This stage will build the code"
+    jobs:
+      - job: 'build'
+        displayName: 'build docker images'
+        
+
+        
