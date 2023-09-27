@@ -9,7 +9,7 @@ function scan_image()
     image_name="pitstop/${app_name}:${version}"
     echo "scanning ${app_name}"
     trivy image --severity LOW,MEDIUM,HIGH,CRITICAL \
-    --format template --template "@contrib/junit.tpl" \
+    --format template --template "@config/junit.tpl" \
     --ignore-unfixed -o junit-report-${app_name}.xml \
     ${image_name}
 
