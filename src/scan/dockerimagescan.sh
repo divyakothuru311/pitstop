@@ -6,7 +6,7 @@ function scan_image()
 
     output="junit-report-${app_name}.xml"
     version="1.0"
-    image_name="${pitstop}/${app_name}:${version}"
+    image_name="pitstop/${app_name}:${version}"
     echo "scanning ${app_name}"
     trivy image --severity LOW,MEDIUM,HIGH,CRITICAL \
     --format template --template "@contrib/junit.tpl" \ 
