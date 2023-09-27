@@ -7,7 +7,21 @@ stages:
     displayName: "This stage will build the code"
     jobs:
       - job: 'build'
-        displayName: 'build docker images'
-        
+        displayName: 'build and scan docker images'
+        steps:
+          - task: Bash@3
+            inputs:
+              filePath: ./src/RebuildAllDockerImage.sh
+          - task: Bash@3
+            inputs:
+              targetType: inline
+              script: |
+                trivy image --severity HIGH,CRITICAL \
+                --format template --template "@contrib/junit.tpl" \ 
+                --ignore-unfixed -o junit-report-webapp.xml pitstop/webapp:1.0
+
+
+
+
 
         

@@ -1,0 +1,9 @@
+webapp
+vehiclemanagementapi
+workshopmanagementapi
+customermanagementapi
+workshopmanagementeventhandler
+notificationservice
+invoiceservice
+timeservice
+auditlogservice
