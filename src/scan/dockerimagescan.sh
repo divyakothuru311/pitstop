@@ -16,7 +16,7 @@ function scan_image()
     echo "Scan completed test report generated at junit-report-${app_name}.xml"
 }
 
-file_path="scan/strings.txt"
+file_path="scan/allservices.txt"
 
 # Check if the file exists
 if [ ! -f "$file_path" ]; then
