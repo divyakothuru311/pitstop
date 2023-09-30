@@ -35,5 +35,5 @@ steps:
     inputs:
       buildType: 'current'
       projects: src/pitstop.sln
-      artifactName: 'nopreleaseartifacts'
+      artifactName: 'pitstopartifacts'
       targetPath: '$(System.ArtifactsDirectory)'
