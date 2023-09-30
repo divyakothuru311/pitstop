@@ -1,0 +1,39 @@
+---
+trigger:
+  - main
+
+pool: 
+  vmImage: ubuntu-latest
+
+steps:
+  # - task: DotNetCoreCLI@2
+  #   inputs:
+  #     command: 'restore'
+  #     projects: src/pitstop.sln
+
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: 'build'
+      projects: src/pitstop.sln
+      configuration: $(buildConfiguration)
+  
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: publish
+      publishWebProjects: True
+      arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+      zipAfterPublish: True
+      
+
+  - task: PublishPipelineArtifact@1
+    inputs:
+      targetPath: '$(Build.ArtifactStagingDirectory)' 
+      arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+      artifactName: 'nopreleaseartifacts'
+
+  - task: DownloadBuildArtifacts@1
+    inputs:
+      buildType: 'current'
+      projects: src/pitstop.sln
+      artifactName: 'nopreleaseartifacts'
+      targetPath: '$(System.ArtifactsDirectory)'
