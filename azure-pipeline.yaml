@@ -108,14 +108,13 @@ stages:
 #       - task: SonarCloudPublish@1
 #         inputs:
 #           pollingTimeoutSec: '300'
- - stage: deploy
-    displayName: Deploy pitstop
-    pool: Default
-    jobs:
-      - job: deployJob
-        displayName: Terraform Deploy Job
-        steps:
-          - bash: terraform init
-            displayName: Initialize Terraform
-          - bash: terraform apply -auto-approve
-            displayName: Deploy Terraform
+- stage: deploy
+  displayName: Deploy pitstop
+  jobs:
+    - job: deployJob
+      displayName: Terraform Deploy Job
+      steps:
+        - bash: terraform init
+          displayName: Initialize Terraform
+        - bash: terraform apply -auto-approve
+          displayName: Deploy Terraform
