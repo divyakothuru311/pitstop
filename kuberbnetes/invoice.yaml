@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: invoiceservice-deploy
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: invoiceservice
+  template:
+    metadata:
+      name: invoiceservice
+      labels:
+        app: invoiceservice
+    spec:
+      containers:
+        - name: invoiceservicecon
+          image: pitstop/invoiceservice:1.0
+          env:
+            - name: DOTNET_ENVIRONMENT
+              value: Production
+         

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: timeservice-service
+spec:
+  selector:
+    app: timeservice
+  ports:
+    - name: http
+      port: 80  
+      targetPort: 5000  
+  type: ClusterIP  

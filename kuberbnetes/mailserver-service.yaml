@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mailserver-service
+spec:
+  selector:
+    app: mailserver
+  ports:
+    - name: smtp
+      port: 25 
+      targetPort: 25
+    - name: http
+      port: 80  
+      targetPort: 80
+  type: ClusterIP  

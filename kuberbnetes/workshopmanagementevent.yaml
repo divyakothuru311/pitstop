@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: workshopmanagementeventhandler-deploy
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: workshopmanagementeventhandler
+  template:
+    metadata:
+      name: workshopmanagementeventhandler
+      labels:
+        app: workshopmanagementeventhandler
+    spec:
+      containers:
+        - name: workshopmanagementeventhandlercon
+          image: pitstop/workshopmanagementeventhandler:1.0
+          env:
+            - name: DOTNET_ENVIRONMENT
+              value: Production
+       

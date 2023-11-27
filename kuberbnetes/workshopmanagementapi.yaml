@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: workshopmanagementapi-deploy
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: workshopmanagementapi
+  template:
+    metadata:
+      name: workshopmanagement
+      labels:
+        app: workshopmanagementapi
+    spec:
+      containers:
+        - name: workshopmanagementapi
+          image: pitstop/workshopmanagementapi:1.0
+          ports:
+            - containerPort: 5000  
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Production
+    

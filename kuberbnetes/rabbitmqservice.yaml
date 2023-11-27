@@ -1,0 +1,18 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pitstopservice
+  labels:
+    env: dev
+spec:
+  type: ClusterIP
+  selector:
+    app: rabbitmq
+  ports:
+    - name: managment
+      targetPort: 15672
+      port: 15672
+    - name: message
+      targetPort: 5672
+      port: 5672

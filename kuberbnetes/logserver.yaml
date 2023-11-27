@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logserver-deploy
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: logserver
+  template:
+    metadata:
+      name: logserver
+      labels:
+        app: logserver
+    spec:
+      containers:
+        - name: logservercon
+          image: datalust/seq:latest
+          ports:
+            - containerPort: 80  
+          env:
+            - name: ACCEPT_EULA
+              value: "Y"
+

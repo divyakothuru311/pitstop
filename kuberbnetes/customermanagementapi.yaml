@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: customermanagementapi-deploy
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: customermanagementapi
+  template:
+    metadata:
+      name: customermanagement 
+      labels:
+        app: customermanagementapi
+    spec:
+      containers:
+        - name: customermanagementapicon
+          image: pitstop/customermanagementapi:1.0
+          ports:
+            - containerPort: 5000  
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Production
+    

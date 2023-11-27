@@ -1,39 +1,121 @@
----
 trigger:
-  - main
+- main
+ 
+pool: Default
+stages:
+- stage: Build
+  displayName: ProjectBuild
+  jobs:
+  - job: Build
+    steps:
+        - task: DotNetCoreCLI@2
+          inputs:
+            command: 'build'
+            projects: src/pitstop.sln
+            configuration: $(buildConfiguration)
 
-pool: 
-  vmImage: ubuntu-latest
+        - task: DotNetCoreCLI@2
+          inputs:
+            command: 'test'
+            projects: 'tests/**/*.csproj'
+            arguments: '--collect "Code Coverage"'
 
-steps:
-  # - task: DotNetCoreCLI@2
-  #   inputs:
-  #     command: 'restore'
-  #     projects: src/pitstop.sln
+        - task: DotNetCoreCLI@2
+          inputs:
+            command: publish
+            publishWebProjects: True
+            projects: '*/*.dll'
+            arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+            publishTestResults: true
+            zipAfterPublish: True
+ 
+        - task: CopyFiles@2
+          inputs:
+            Contents: '**/*.dll'
+            TargetFolder: $(Build.ArtifactStagingDirectory) 
 
-  - task: DotNetCoreCLI@2
-    inputs:
-      command: 'build'
-      projects: src/pitstop.sln
-      configuration: $(buildConfiguration)
-  
-  - task: DotNetCoreCLI@2
-    inputs:
-      command: publish
-      publishWebProjects: True
-      arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
-      zipAfterPublish: True
-      
+        - task: PublishPipelineArtifact@1
+          inputs:
+            targetPath: '$(Build.ArtifactStagingDirectory)' 
+            arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+            artifactName: 'pitstopartifacts'
 
-  - task: PublishPipelineArtifact@1
-    inputs:
-      targetPath: '$(Build.ArtifactStagingDirectory)' 
-      arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
-      artifactName: 'nopreleaseartifacts'
+# - stage: Jfrog
+#   displayName: Jfrog
+#   jobs:
+#   - job: ArtifactArchivingStage
+#     steps:
+#       - task: DownloadPipelineArtifact@2
+#         inputs:
+#           buildType: 'current'
+#           artifactName: 'pitstopartifacts' 
+#           targetPath: '$(Pipeline.Workspace)'
+#       - task: ArtifactoryGenericUpload@2
+#         inputs:
+#           artifactoryService: 'jfrog-server'
+#           specSource: 'taskConfiguration'
+#           fileSpec: |
+#             {
+#                           "files": [
+#                             {
+#                               "pattern": "$(Pipeline.Workspace)/*.dll",
+#                               "target": "pitstop-nuget-local"
+#                             }
+#                           ]
+#                         }
+#           collectBuildInfo: true
+#           buildName: '$(Build.DefinitionName)'
+#           buildNumber: '$(Build.BuildNumber)'
+#           projectKey: '$(project-key)'
+#           failNoOp: true
+#       - task: ArtifactoryPublishBuildInfo@1
+#         inputs:
+#           artifactoryService: 'jfrog-server' 
+#           buildName: '$(Build.DefinitionName)'
+#           buildNumber: '$(Build.BuildNumber)'
+#           projectKey: '$(project-key)'
 
-  - task: DownloadBuildArtifacts@1
-    inputs:
-      buildType: 'current'
-      projects: src/pitstop.sln
-      artifactName: 'pitstopartifacts'
-      targetPath: '$(System.ArtifactsDirectory)'
+
+# - stage: sonarqube
+#   displayName: sonarqube for pitstop
+#   jobs:
+#   - job: staticcodejob
+#     steps:
+#       - checkout: self
+#         fetchDepth: 0
+#       - task: SonarCloudPrepare@1
+#         inputs:
+#           SonarCloud: 'sonarcloud'
+#           organization: 'divyakothuru311'
+#           scannerMode: 'Other'
+#           extraProperties: |
+#             # # Additional properties that will be passed to the scanner,
+#             # # Put one key=value per line, example:
+#             # # sonar.exclusions=**/*.bin
+#             # sonar.projectKey=divyakothuru311_pitstop123
+#             # sonar.projectName=pitstop123
+#                 # dotnet tool install --global dotnet-sonarscanner
+#                 # dotnet sonarscanner begin /k:"divyakothuru311_pitstop123" /o:"divyakothuru311" /d:sonar.token="d7220a5c67e6754abccd2f37302e19cb54278963"
+#                 # dotnet build src/pitstop.sln
+#                 # dotnet sonarscanner end /d:sonar.token="d7220a5c67e6754abccd2f37302e19cb54278963"
+#             dotnet sonarscanner begin \
+#               /o:divyakothuru311 \
+#               /k:divyakothuru311_pitstop123 \
+#               /d:sonar.host.url=https://sonarcloud.io
+#             dotnet build src/pitstop.sln
+#             dotnet sonarscanner end
+
+#       - task: SonarCloudPublish@1
+#         inputs:
+#           pollingTimeoutSec: '300'
+ - stage: deploy
+    displayName: Deploy pitstop
+    pool: Default
+    jobs:
+      - job: deployJob
+        displayName: Terraform Deploy Job
+        steps:
+          - bash: terraform init
+            displayName: Initialize Terraform
+          - bash: terraform apply -auto-approve
+            displayName: Deploy Terraform

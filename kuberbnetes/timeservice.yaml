@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: timeservice-deploy
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: timeservice
+  template:
+    metadata:
+      name: timeservice
+      labels:
+        app: timeservice
+    spec:
+      containers:
+        - name: timeservicecon
+          image: pitstop/timeservice:1.0
+          env:
+            - name: DOTNET_ENVIRONMENT
+              value: Production
+      
